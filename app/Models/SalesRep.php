@@ -19,4 +19,9 @@ class SalesRep extends Model
     {
         return $this->belongsTo(Region::class);
     }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
+    }
 }
