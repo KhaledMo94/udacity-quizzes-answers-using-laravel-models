@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\Order;
 use App\Models\WebEvent;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,40 +17,28 @@ class AnswersController extends Controller
      */
     public function index()
     {
+        //--------------------------(( Chapter 1 ))---------------------------------
         // 1 - return Order::get();
-
         // ------------------------------------------------------
-
         // 2a - $events = WebEvent::all('occurred_at','account_id','channel');
         // return $events->take(15);
-
         //-------------------------------------------------------
-
         // 2b - return WebEvent::select(['occurred_at','account_id','channel'])->limit(15)->get();
-
         //------------------------------------------------------------
-
         // 2c - return DB::table('web_events')->select('occurred_at','account_id','channel')->limit(15)->get();
-
         //-------------------------------------------------------------
-
         // 3 - $orders = Order::early()->limit(10)->get();
         // $orders = $orders->map(function($orders){
         //     return $orders->only(['id','occurred_at','totalUSD']);
         // });
         // return $orders;
-
         //---------------------------------------------------------------
-
         // 4 - $orders = Order::all();
         // $orders = $orders->sortBy(function ($orders){
         //     return $orders->totalUSD;
         // },SORT_REGULAR,true);
         // return $orders->select('occurred_at','account_id','totalUSD')->take(5);
-
         //------------------------------------------------------------------
-
-        
         // 5 - $orders = Order::all();
         //   $orders = $orders->sortBy(function($orders){
         //     return $orders->account_id;
@@ -57,9 +46,7 @@ class AnswersController extends Controller
         //     return $orders->totalUSD;
         // });
         // return $orders->select(['id','account_id','totalUSD']);
-
         //-------------------------------------------------------------------
-
         // 6 - $orders = Order::all();
         //  $orders = $orders->sortByDesc(function($orders){
         //     return $orders->totalUSD;
@@ -67,7 +54,6 @@ class AnswersController extends Controller
         //     return $orders->account_id;
         // });
         // return $orders->select(['id','account_id','totalUSD']);
-
         //---------------------------------------------------------------------
         // 7 - $orders = Order::where('gloss_amt_usd',">=",1000)->limit(5)->get();
         //-------------------------------------------------------------------------
@@ -77,20 +63,20 @@ class AnswersController extends Controller
         // });
         // return $orders->take(10);
         //-----------------------------------------------------------------
-        // 9 - $account = Account::where('name','Exxon Mobil')->select('name', 'website', 'primary_poc')->get();
-        // return $account;
+        // 9 - $accounts = Account::where('name','Exxon Mobil')->select('name', 'website', 'primary_poc')->get();
+        // return $accounts;
         //------------------------------------------------------------------
         //     10 - $orders = Order::where('standard_qty','<>',0)->get();
         //     return $orders->select('id','account_id','unitPriceStandard')->all();
         //-----------------------------------------------------------------------
-        // 11a - $account = Account::where('name','like','C%')->get();
-        // return $account;
+        // 11a - $accounts = Account::where('name','like','C%')->get();
+        // return $accounts;
         //-----------------------------------------------------------
-        // 11b - $account = Account::all();
-        // $account = $account->filter(function($account){
-        //     return Str::startsWith($account->name, 'C');
+        // 11b - $accounts = Account::all();
+        // $accounts = $accounts->filter(function($accounts){
+        //     return Str::startsWith($accounts->name, 'C');
         // });
-        // return $account;
+        // return $accounts;
         //--------------------------------------------
         // 12a - $accounts = Account::where('name','like','%one%')->get();
         // return $accounts;
@@ -138,6 +124,119 @@ class AnswersController extends Controller
         // })->select('name', 'primary_poc', 'sales_rep_id');
         // return $accounts;
         //------------------------------------------------------------
+        // 17a - $events = WebEvent::whereNotIn('channel',['organic','adwords'])
+        // ->get();
+        // return $events;
+        //------------------------------------------------------------
+        // 17b - $events = WebEvent::all();
+        // $events = $events ->filter(function($events){
+        //     return !in_array($events->channel , ['organic','adwords']);
+        // });
+        // return $events;
+        //-------------------------------------------------------------
+        // 18a - $accounts = Account::where('name','not like','%C')->select('name')->get();
+        // return $accounts;
+        //-------------------------------------------------------------
+        // 18b - $accounts = Account::all();
+        // $accounts = $accounts->filter(function($accounts){
+        //     return $accounts->name[-1] !== "C" && $accounts->name[-1] !== "C";
+        // })->select('name');
+        // return $accounts;
+        //-------------------------------------------------------------
+        // 19a - $accounts = Account::where('name','not like','%one%')->select('name')->get();
+        // return $accounts;
+        //-------------------------------------------------------------
+        // 19b - $accounts = Account::all('name');
+        // $accounts = $accounts->filter(function($accounts){
+        //     return !Str::contains($accounts->name , 'one');
+        // });
+        // return $accounts;
+        //--------------------------------------------------------------
+        // 20a - $accounts = Account::where('name','not like','%s')
+        // ->Where('name','not like','%S')->select('name')->get();
+        // return $accounts;
+        //-------------------------------------------------------------
+        // 21a - $orders = Order::where('standard_qty','>',1000)
+        // ->where('poster_qty',0)->where('gloss_qty',0)->get();
+        // return $orders;
+        //--------------------------------------------------------------
+        // 21b - $orders = Order::all();
+        // $orders = $orders->filter(function($orders){
+        //     return $orders->standard_qty > 1000 && $orders->poster_qty == 0 && $orders->gloss_qty == 0; 
+        // });
+        // return $orders;
+        //---------------------------------------------------------------
+        // 22a - $accounts = Account::where('name','not like','C%')
+        // ->where('name','like','%s')->get();
+        // return $accounts;
+        //--------------------------------------------------------------------
+        // 22b - $accounts = Account::all();
+        // $accounts = $accounts->filter(function($accounts){
+        //     return !(Str::startsWith($accounts->name, 'C')) && Str::endsWith($accounts->name,'s');
+        // });
+        // return $accounts;
+        //---------------------------------------------------------------------
+        // 23a - $orders = Order::whereBetween('gloss_qty',[24 , 29])
+        //         ->select('gloss_qty','occurred_at')->get();
+        // return $orders;
+        //---------------------------------------------------------------------
+        // 23b - $orders = Order::select('gloss_qty','occurred_at')->get();
+        // $orders = $orders->filter(function($orders){
+        //     return ($orders->gloss_qty >= 24 ) && ($orders->gloss_qty <= 29);
+        // });
+        // return $orders;
+        //-----------------------------------------------------------------------
+        // 24a - $events = WebEvent::where('channel','adword')->orWhere('channel','organic')
+        // ->whereYear('occurred_at','=',2016)->orderBy('occurred_at')->get();
+        // return $events;
+        //-------------------------------------------------------------------------
+        // 24b - $events = WebEvent::all();
+        // $events = $events->filter(function($events){
+        //     return Carbon::parse($events->occurred_at)->year == '2016';
+        // })->whereIn('channel',['adword','organic']);
+        // $events = $events->sortBy(function($events){
+        //     return Carbon::parse($events->occurred_at);
+        // });
+        // return $events;
+        //-------------------------------------------------------------------------
+        // 25a - $orders = Order::where('gloss_qty','>',4000)->orWhere('poster_qty','>',4000)
+        // ->select('id')->get();
+        // return $orders;
+        //-------------------------------------------------------------------------
+        // 25b - $orders = Order::all()->filter(function($orders){
+        //     return $orders->gloss_qty > 4000  || $orders->poster_qty > 4000;
+        // })->select('id');
+        // return $orders;
+        //---------------------------------------------------------------------------
+        // 26a - $orders = Order::where('standard_qty',0)
+        // ->where(function($orders){
+        //     return $orders->where('gloss_qty',">",1000)->orWhere('poster_qty',">",1000);
+        // })->select('id')->get();
+        // return $orders;
+        //--------------------------------------------------------------------------
+        // 26b - $orders = Order::all('id','poster_qty','gloss_qty','standard_qty')
+        // ->filter(function($orders){
+        //     return $orders->standard_qty == 0 && ($orders->gloss_qty > 1000  || $orders->poster_qty >1000) ;
+        // })->select('id');
+        // return $orders;
+        //---------------------------------------------------------------------------
+        // 27a - $accounts = Account::where(function($accounts){
+        //     return $accounts->where('name','like','C%') || $accounts->where('name','like','W%');
+        // })->where(function($accounts){
+        //     return $accounts->where('primary_poc','like','%ana%') || $accounts->where('primary_poc','like','%Ana%');
+        // })->where('primary_poc','not like','%eana%')->get();
+        // return $accounts;
+        //------------------------------------------------------------------------------
+        // 27b - $accounts = Account::all()->filter(function($accounts){
+        //     return Str::startsWith($accounts->name,'C') || Str::startsWith($accounts->name,'W');
+        // })->filter(function($accounts){
+        //     return Str::contains($accounts->primary_poc,'ana') || Str::contains($accounts->primary_poc,'Ana');
+        // })->reject(function($accounts){
+        //     return Str::contains($accounts->primary_poc ,'eana'); 
+        // });
+        // return $accounts;
+        //----------------------------------------------------------------------------------
+
     }
 
     /**
