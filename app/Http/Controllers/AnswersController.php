@@ -19,6 +19,7 @@ class AnswersController extends Controller
     public function index()
     {
         //--------------------------(( Chapter 1 ))---------------------------------
+        //--------------------------(( Chapter 1 ))---------------------------------
         // 1 - return Order::get();
         // ------------------------------------------------------
         // 2a - $events = WebEvent::all('occurred_at','account_id','channel');
@@ -66,17 +67,25 @@ class AnswersController extends Controller
         //-----------------------------------------------------------------
         // 9 - $accounts = Account::where('name','Exxon Mobil')->select('name', 'website', 'primary_poc')->get();
         // return $accounts;
+        // 9 - $accounts = Account::where('name','Exxon Mobil')->select('name', 'website', 'primary_poc')->get();
+        // return $accounts;
         //------------------------------------------------------------------
         //     10 - $orders = Order::where('standard_qty','<>',0)->get();
         //     return $orders->select('id','account_id','unitPriceStandard')->all();
         //-----------------------------------------------------------------------
         // 11a - $accounts = Account::where('name','like','C%')->get();
         // return $accounts;
+        // 11a - $accounts = Account::where('name','like','C%')->get();
+        // return $accounts;
         //-----------------------------------------------------------
         // 11b - $accounts = Account::all();
         // $accounts = $accounts->filter(function($accounts){
         //     return Str::startsWith($accounts->name, 'C');
+        // 11b - $accounts = Account::all();
+        // $accounts = $accounts->filter(function($accounts){
+        //     return Str::startsWith($accounts->name, 'C');
         // });
+        // return $accounts;
         // return $accounts;
         //--------------------------------------------
         // 12a - $accounts = Account::where('name','like','%one%')->get();
