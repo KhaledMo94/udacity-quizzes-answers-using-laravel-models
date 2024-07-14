@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Order;
+use App\Models\Region;
 use App\Models\SalesRep;
 use App\Models\WebEvent;
 use Carbon\Carbon;
@@ -291,7 +292,230 @@ class AnswersController extends Controller
         // $result = $result->sortBy('account_name');
         // return $result->values();
         //--------------------------------------------------------------------------------------
-        
+        // 30 - $query = SalesRep::with('accounts.orders','region')->get();
+        // $result = collect([]);
+        // foreach( $query as $row){
+        //     foreach($row->accounts as $account){
+        //         foreach($account->orders as $order){
+        //             $section = [
+        //                 'account'                   =>$account->name,
+        //                 'region'                    =>$row->region->name,
+        //                 'unit_price'                =>$order->totalUSD / ($order->totalAmount+0.01), 
+        //             ];
+        //             $result = $result->push($section);
+        //         }
+        //     }
+        // }
+        // return $result;
+        //-----------------------------------------------------------------------------------------
+        // 31a - $query = SalesRep::join('accounts','accounts.sales_rep_id','=','sales_reps.id')
+        // ->join('region','sales_reps.region_id','=','region.id')
+        // ->select(
+        //     'sales_reps.name as sales_name',
+        //     'accounts.name as account_name',
+        //     'region.name as region_name')
+        // ->where('region.name','Midwest')
+        // ->orderBy('accounts.name')->get();
+        // // dd($query->toSql());
+        // return $query;
+        //---------------------------------------------------------------------------------------------
+        // 31b - $query =SalesRep::with(['accounts','region'])->get();
+        // $query = $query->filter(function($query){
+        //     return $query->region->name == "Midwest" ;
+        // });
+        // // return $query;
+        // $result = collect([]);
+        // foreach($query as $row){
+        //     foreach($row->accounts as $account){
+        //         $section = [
+        //             'sales_rep'                 =>$row->name,
+        //             'Acc name'                  =>$account->name,
+        //             'region'                    =>$row->region->name,
+        //         ];
+        //         $result = $result->push($section);
+        //     };
+        // };
+        // return $result->sortBy('Acc name')->values();
+        //----------------------------------------------------------------------
+        //32a - $query = SalesRep::join('accounts','accounts.sales_rep_id','=','sales_reps.id')
+        //     ->join('region','sales_reps.region_id','=','region.id')
+        //     ->select(
+        //         'sales_reps.name as sales_name',
+        //         'accounts.name as account_name',
+        //         'region.name as region_name')
+        //     ->where('region.name','Midwest')
+        //     ->where('sales_reps.name','like','S%')
+        //     ->orderBy('accounts.name')->get();
+        // return $query;
+        //--------------------------------------------------------------------------------
+        // 32b - $query = SalesRep::with(['accounts','region'])->get();
+        // $result = collect();
+        // foreach($query as $row){
+        //     foreach ($row->accounts as $account){
+        //         if(Str::startsWith($row->name , 'S') && $row->region->name == "Midwest" ){
+        //             $section = [
+        //             'sales_rep'                 =>$row->name,
+        //             'Acc name'                  =>$account->name,
+        //             'region'                    =>$row->region->name,
+        //             ];
+        //             $result = $result->push($section);
+        //         };
+        //     };
+        // };
+        // return $result->sortBy('Acc name')->values();
+        //-----------------------------------------------------------------------------------
+        // 33a - $query = SalesRep::join('accounts','accounts.sales_rep_id','=','sales_reps.id')
+        //     ->join('region','sales_reps.region_id','=','region.id')
+        //     ->select(
+        //         'sales_reps.name as sales_name',
+        //         'accounts.name as account_name',
+        //         'region.name as region_name')
+        //     ->where('region.name','Midwest')
+        //     ->where('sales_reps.name','like','% k%')
+        //     ->orderBy('accounts.name')->get();
+        // return $query;
+        //-----------------------------------------------------------------------------------
+        // 33b - $query = SalesRep::with(['accounts','region'])->get();
+        // $result = collect();
+        // foreach($query as $row){
+        //     foreach ($row->accounts as $account){
+        //         if(preg_match('/\sK/',$row->name) && $row->region->name == "Midwest" ){
+        //             $section = [
+        //             'sales_rep'                 =>$row->name,
+        //             'Acc name'                  =>$account->name,
+        //             'region'                    =>$row->region->name,
+        //             ];
+        //             $result = $result->push($section);
+        //         };
+        //     };
+        // };
+        // return $result->sortBy('Acc name')->values();
+        //------------------------------------------------------------------------------------
+        // 34a - $query = Region::with('salesReps.accounts.orders')->get();
+        // $collection = collect();
+        // foreach ($query as $region){
+        //     foreach ( $region->salesReps as $rep){
+        //         foreach ($rep->accounts as $account){
+        //             foreach ($account->orders as $order){
+        //                 if($order->standard_qty >100){
+        //                     $section = [
+        //                         'region'                =>$region->name,
+        //                         'account'               =>$account->name,
+        //                         'unit-price'            =>$order->totalUSD/($order->totalAmount + 0.01),
+        //                     ];
+        //                     $collection = $collection->push($section);
+        //                 };
+        //             };
+        //         };
+        //     };
+        // };
+        // return $collection;
+        //-------------------------------------------------------------------------
+        // 34b - $query = Order::join('accounts as a','orders.account_id','=','a.id')
+        // ->join('sales_reps as s','a.sales_rep_id','=','s.id')
+        // ->join('region as r','r.id','=','s.region_id')
+        // ->select('r.name as region_name','a.name as account_name','orders.*')
+        // ->where('orders.standard_qty','>',100)->get();
+        // $result= $query->map(function($query){
+        //     return [
+        //         'region_name'                       =>$query->region_name,
+        //         'account_name'                      =>$query->account_name,
+        //         'unit-price'                        =>$query->totalUSD/($query->totalAmount+ 0.01),
+        //     ];
+        // });
+        // return $result;
+        //-----------------------------------------------------------------------
+        // 35a - $query = Region::with('salesReps.accounts.orders')->get();
+        // $collection = collect();
+        // foreach ($query as $region){
+        //     foreach ( $region->salesReps as $rep){
+        //         foreach ($rep->accounts as $account){
+        //             foreach ($account->orders as $order){
+        //                 if($order->standard_qty >100 && $order->poster_qty >50 ){
+        //                     $section = [
+        //                         'region'                =>$region->name,
+        //                         'account'               =>$account->name,
+        //                         'unit-price'            =>$order->totalUSD/($order->totalAmount + 0.01),
+        //                     ];
+        //                     $collection = $collection->push($section);
+        //                 };
+        //             };
+        //         };
+        //     };
+        // };
+        // return $collection->sortBy('unit-price')->values();
+        //--------------------------------------------------------------------------------
+        // 35b - $query = Order::join('accounts as a','orders.account_id','=','a.id')
+        // ->join('sales_reps as s','a.sales_rep_id','=','s.id')
+        // ->join('region as r','r.id','=','s.region_id')
+        // ->select('r.name as region_name','a.name as account_name','orders.*')
+        // ->where('orders.standard_qty','>',100)
+        // ->where('orders.poster_qty','>',50)
+        // ->get();
+        // $result= $query->map(function($query){
+        //     return [
+        //         'region_name'                       =>$query->region_name,
+        //         'account_name'                      =>$query->account_name,
+        //         'unit-price'                        =>$query->totalUSD/($query->totalAmount + 0.01),
+        //     ];
+        // })->sortBy('unit-price')->values();
+        // return $result;
+        //----------------------------------------------------------------
+        // 36a - $query = Region::with('salesReps.accounts.orders')->get();
+        // $collection = collect();
+        // foreach ($query as $region){
+        //     foreach ( $region->salesReps as $rep){
+        //         foreach ($rep->accounts as $account){
+        //             foreach ($account->orders as $order){
+        //                 if($order->standard_qty >100 && $order->poster_qty >50 ){
+        //                     $section = [
+        //                         'region'                =>$region->name,
+        //                         'account'               =>$account->name,
+        //                         'unit-price'            =>$order->totalUSD/($order->totalAmount + 0.01),
+        //                     ];
+        //                     $collection = $collection->push($section);
+        //                 };
+        //             };
+        //         };
+        //     };
+        // };
+        // return $collection->sortBy('unit-price',SORT_REGULAR,true)->values();
+        //------------------------------------------------------------------------------
+        // 36b - $query = Order::join('accounts as a','orders.account_id','=','a.id')
+        // ->join('sales_reps as s','a.sales_rep_id','=','s.id')
+        // ->join('region as r','r.id','=','s.region_id')
+        // ->select('r.name as region_name','a.name as account_name','orders.*')
+        // ->where('orders.standard_qty','>',100)
+        // ->where('orders.poster_qty','>',50)
+        // ->get();
+        // $result= $query->map(function($query){
+        //     return [
+        //         'region_name'                       =>$query->region_name,
+        //         'account_name'                      =>$query->account_name,
+        //         'unit-price'                        =>$query->totalUSD/($query->totalAmount + 0.01),
+        //     ];
+        // })->sortBy('unit-price',SORT_REGULAR,true)->values();
+        // return $result;
+        //-----------------------------------------------------------------------------
+        // 37a - $query = Account::join('web_events as w','w.account_id','=','accounts.id')
+        // ->select('accounts.name','w.channel')
+        // ->distinct()
+        // ->where('accounts.id',1001)
+        // ->get();
+        // return $query;
+        //-----------------------------------------------------------------------------
+        $query = Order::with('account')->get();
+        $query = $query->filter(function($query){
+            return Carbon::parse($query->occurred_at)->year =='2015';
+        })->map(function($query){
+            return [
+                'occurred_at'           =>$query->occurred_at,
+                'total amount'          =>$query->totalAmount,
+                'total USD'             =>$query->totalUSD,
+                'account'               =>$query->account->name
+            ];
+        });
+        return $query;
     }
 
     /**
