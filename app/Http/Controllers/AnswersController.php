@@ -504,18 +504,399 @@ class AnswersController extends Controller
         // ->get();
         // return $query;
         //-----------------------------------------------------------------------------
-        $query = Order::with('account')->get();
-        $query = $query->filter(function($query){
-            return Carbon::parse($query->occurred_at)->year =='2015';
-        })->map(function($query){
-            return [
-                'occurred_at'           =>$query->occurred_at,
-                'total amount'          =>$query->totalAmount,
-                'total USD'             =>$query->totalUSD,
-                'account'               =>$query->account->name
-            ];
-        });
-        return $query;
+        // 37b -$query = Order::with('account')->get();
+        // $query = $query->filter(function($query){
+        //     return Carbon::parse($query->occurred_at)->year =='2015';
+        // })->map(function($query){
+        //     return [
+        //         'occurred_at'           =>$query->occurred_at,
+        //         'total amount'          =>$query->totalAmount,
+        //         'total USD'             =>$query->totalUSD,
+        //         'account'               =>$query->account->name
+        //     ];
+        // });
+        // return $query;
+        //================================================================================
+        //==========================  End of Chapter 2  ==================================
+        //==========================  Chapter 3 ==========================================
+
+        // 38a - $total_poster=Order::sum('poster_qty');
+        // return $total_poster;
+        //-------------------------------------------------------------
+        // 38b - $total_poster = DB::table('orders')->sum('poster_qty');
+        // return $total_poster;
+        //---------------------------------------------------------
+        // 38c - $query = Order::select('poster_qty')->get();
+        // return $query->sum('poster_qty');
+        //-----------------------------------------------------------
+        // 39a - $total_standard=Order::sum('standard_qty');
+        // return $total_standard;
+        //-------------------------------------------------------------
+        // 39b - $total_standard = DB::table('orders')->sum('standard_qty');
+        // return $total_standard;
+        //---------------------------------------------------------
+        // 39c - $query = Order::select('standard_qty')->get();
+        // return $query->sum('standard_qty');
+        //-----------------------------------------------------------
+        // 40a - $usd = Order::all();
+        // return $usd->sum('totalUSD');
+        //------------------------------------------------------------
+        // 41a - $total = Order::all('id','standard_amt_usd','gloss_amt_usd');
+        // return $total->map(function($total){
+        //     return [
+        //         'total'             =>$total->standard_amt_usd + $total->gloss_amt_usd,
+        //         'id'                =>$total->id
+        //     ];
+        // });
+        //------------------------------------------------------------------------
+        // 41b - $total = Order::selectRaw('standard_amt_usd + gloss_amt_usd as total')->get();
+        // return $total;
+        //-------------------------------------------------------------------------
+        // 41c - $total = DB::table('orders')->selectRaw('standard_amt_usd + gloss_amt_usd as total')->get();
+        // return $total;
+        //-------------------------------------------------------------------------
+        // 42a - $result = Order::selectRaw('avg(standard_amt_usd) / avg(standard_qty)')->get();
+        // return $result;
+        //-------------------------------------------------------------------------------------
+        // 42b - $result = DB::table('orders')->selectRaw('avg(standard_amt_usd) / avg(standard_qty)')->get();
+        // return $result;
+        //-------------------------------------------------------------------------------
+        // 43a - $date = Order::selectRaw('min(occurred_at) as occurred_at')->get();
+        // return $date[0]->occurred_at;
+        //-------------------------------------------------------------------------------
+        // 43b - $date = DB::table('orders')->min('occurred_at');
+        // return $date;
+        //---------------------------------------------------------------------
+        // 43c - $date = Order::min('occurred_at');
+        // return $date;
+        //---------------------------------------------------------------------
+        // 44d - $date = Order::all('occurred_at')->min('occurred_at');
+        // return $date;
+        //---------------------------------------------------------------------
+        // 45 - $date = Order::select('occurred_at')->orderBy('occurred_at')->first();
+        // return $date;
+        //----------------------------------------------------------------
+        // 46a - $event = WebEvent::max('occurred_at');
+        // return $event;
+        //----------------------------------------------------------------
+        // 46b - $event = WebEvent::select('occurred_at')->orderBy('occurred_at','desc')->first();
+        // return $event->occurred_at;
+        //----------------------------------------------------------------
+        // 49a - $query = Order::selectRaw(    
+        // 'avg(standard_qty) as avg_standard_qty, ' .
+        // 'avg(poster_qty) as avg_poster_qty, ' .
+        // 'avg(gloss_qty) as avg_gloss_qty, ' .
+        // 'avg(standard_amt_usd) as avg_standard_amt_usd, ' .
+        // 'avg(poster_amt_usd) as avg_poster_amt_usd, ' .
+        // 'avg(gloss_amt_usd) as avg_gloss_amt_usd')->get();
+        // return $query;
+        //----------------------------------------------------------------
+        // 49b - $query = DB::table('orders')->selectRaw(    
+        //     'avg(standard_qty) as avg_standard_qty, ' .
+        //     'avg(poster_qty) as avg_poster_qty, ' .
+        //     'avg(gloss_qty) as avg_gloss_qty, ' .
+        //     'avg(standard_amt_usd) as avg_standard_amt_usd, ' .
+        //     'avg(poster_amt_usd) as avg_poster_amt_usd, ' .
+        //     'avg(gloss_amt_usd) as avg_gloss_amt_usd')->get();
+        //     return $query;
+        //----------------------------------------------------------------
+        // 50 - $query = Order::all();
+        // if($query->count()%2 === 0){
+        //     $first = $query->select('totalUSD')->sortBy('totalUSD')
+        //     ->offsetGet($query->count()/2);
+        //     $second = $query->select('totalUSD')->sortBy('totalUSD')
+        //     ->offsetGet(($query->count()/2)-1);
+        //     return ($first['totalUSD'] + $second['totalUSD'])/2;
+        // }else{
+        //     $median = $query->select('totalUSD')->sortBy('totalUSD')
+        //     ->offsetGet(floor($query->count()/2))['totalUSD'];
+        //     return $median;
+        // }
+        //----------------------------------------------------------------
+        // 51a - $first_order = Order::with('account')
+        // ->orderBy('occurred_at')
+        // ->first();
+        // return response()->json([
+        //     'Account'               =>$first_order->account->name,
+        //     'Date'                  =>$first_order->occurred_at
+        // ]);
+        //--------------------------------------------------------------
+        // 51b - $first_order = Order::join('accounts as a','orders.account_id','=','a.id')
+        // ->orderBy('orders.occurred_at')->limit(1)->select('a.name','orders.occurred_at')->get();
+        // return $first_order;
+        //--------------------------------------------------------------
+        // 52a - $orders = Order::with('account')->get(); //to get totalUSD
+        // $grouped = $orders->groupBy('account.name');
+        // $result = $grouped->map(function ($grouped, $accountName) {
+        //     $totalSalesUsd = $grouped->sum('totalUSD');
+        //     return [
+        //         'account_name' => $accountName,
+        //         'total_sales_usd' => $totalSalesUsd,
+        //     ];
+        // });
+        // return $result;
+        //--------------------------------------------------------------
+        // 52b - $query = Order::join('accounts as a','a.id','=','orders.account_id')
+        // ->select('a.name')
+        // ->selectRaw('sum(orders.standard_amt_usd) as standard_amt_usd')
+        // ->selectRaw('sum(orders.gloss_amt_usd) as gloss_amt_usd')
+        // ->selectRaw('sum(orders.poster_amt_usd) as poster_amt_usd')
+        // ->groupBy('a.name')
+        // ->get();
+        // return $query->map(function($query){
+        //     return [
+        //         'Account'                   =>$query->name,
+        //         'totalUsd'                  =>$query->totalUSD
+        //     ];
+        // });
+        //--------------------------------------------------------------
+        // 53a - $event = WebEvent::with('account')->where('occurred_at',WebEvent::max('occurred_at'))->get();
+        // return $event->map(function($event){
+        //     return [
+        //     'Channel'                       =>$event->channel,
+        //     'Occurred_at'                   =>$event->occurred_at,
+        //     'Account'                       =>$event->account->name
+        //     ]; 
+        // });
+        //-------------------------------------------------------------------
+        // 53b - $event = WebEvent::with('account')->orderBy('occurred_at','desc')->first();
+        // return response()->json([
+        //     'Channel'                       =>$event->channel,
+        //     'Occurred_at'                   =>$event->occurred_at,
+        //     'Account'                       =>$event->account->name
+        // ]);
+        //-------------------------------------------------------------------
+        // 53c - $events = WebEvent::with('account')->orderBy('occurred_at')->get();
+        // $event = $events->last();
+        // return response()->json([
+        //     'Channel'                       =>$event->channel,
+        //     'Occurred_at'                   =>$event->occurred_at,
+        //     'Account'                       =>$event->account->name
+        // ]);
+        //-------------------------------------------------------------------
+        // 54a - $event = WebEvent::all();
+        // $event = $event->groupBy('channel')->map(function($event , $channel){
+        //     return [
+        //         'channel'               =>$channel,
+        //         'Count'                 =>$event->count()
+        //     ];
+        // })->values();
+        // return $event;
+        //-------------------------------------------------------------------
+        // 54b - $events_count = WebEvent::select('channel')
+        // ->selectRaw('count(*) as count')->groupBy('channel')->get();
+        // return $events_count;
+        //-------------------------------------------------------------------
+        // 55a - $query = WebEvent::with('account')->orderBy('occurred_at')->first();
+        // return $query->account->primary_poc;
+        //-------------------------------------------------------------------
+        // 55b - $query = WebEvent::with('account')->where('occurred_at',WebEvent::min('occurred_at'))->get();
+        // return $query[0]->account->primary_poc;
+        //-------------------------------------------------------------------
+        // 56a -  $query = Order::with('account')->get();
+        // $query = $query->groupBy(function($query){
+        //     return $query->account->name;
+        // })->values();
+        // $query = $query->map(function($query){
+        //     return [
+        //         'account'               =>$query[0]->account->name,
+        //         'least_order'           =>$query->min('totalUSD')
+        //     ];
+        // });
+        // return $query->sortBy('least_order')->values();
+        //-------------------------------------------------------------------
+        // 56b - $query = Order::join('accounts as a','a.id','=','orders.account_id')
+        // ->select('a.name')
+        // ->selectRaw('min(orders.standard_amt_usd + orders.gloss_amt_usd + orders.poster_amt_usd) as minimum_usd')
+        // ->groupBy('a.name')
+        // ->orderBy('minimum_usd')->get();
+        // return $query;
+        //-------------------------------------------------------------------
+        // 57a - $regions = Region::with('salesReps')->get();
+        // $regions = $regions->groupBy('name')->map(function($regions , $region){
+        //     return [
+        //         'region_name'           =>$region,
+        //         'rep_count'             =>$regions[0]->salesReps->count()
+        //     ];
+        // });
+        // return $regions->sortBy('rep_count')->values();
+        //-------------------------------------------------------------------
+        // 57b - $region = Region::join('sales_reps as s','region.id','=','s.region_id')
+        // ->select('region.name')
+        // ->selectRaw('count(s.id) as count')
+        // ->groupBy('region.name')
+        // ->orderBy('count')
+        // ->get();
+        // return $region;
+        //-------------------------------------------------------------------
+        // 58a - $accounts = Account::with('orders')->get();
+        // $accounts = $accounts->groupBy(function($accounts){
+        //     return $accounts->name;
+        // })
+        // ->map(function($accounts , $name){
+        //     return [
+        //         'account_name'                  =>$name,
+        //         'poster_avg'                    =>$accounts[0]->orders->avg('poster_qty'),
+        //         'gloss_avg'                    =>$accounts[0]->orders->avg('gloss_qty'),
+        //         'standard_avg'                    =>$accounts[0]->orders->avg('standard_qty'),
+        //     ];
+        // });
+        // return $accounts;
+        //---------------------------------------------------------------------
+        // 58b - $accounts = Account::join('orders as o','o.account_id','=','accounts.id')
+        // ->groupBy('accounts.name')
+        // ->select('accounts.name')
+        // ->selectRaw('avg (o.standard_qty) as standard_avg')
+        // ->selectRaw('avg (o.poster_qty) as poster_avg')
+        // ->selectRaw('avg (o.gloss_qty) as gloss_avg')->get();
+        // return $accounts;
+        //---------------------------------------------------------------------
+        // 59a - $accounts = Account::with('orders')->get();
+        // $accounts = $accounts->groupBy(function($accounts){
+        //     return $accounts->name;
+        // })
+        // ->map(function($accounts , $name){
+        //     return [
+        //         'account_name'                  =>$name,
+        //         'poster_avg'                    =>$accounts[0]->orders->avg('poster_amt_usd'),
+        //         'gloss_avg'                    =>$accounts[0]->orders->avg('gloss_amt_usd'),
+        //         'standard_avg'                    =>$accounts[0]->orders->avg('standard_amt_usd'),
+        //     ];
+        // });
+        // return $accounts;
+        //---------------------------------------------------------------------
+        // 59b - $accounts = Account::join('orders as o','o.account_id','=','accounts.id')
+        // ->groupBy('accounts.name')
+        // ->select('accounts.name')
+        // ->selectRaw('avg (o.standard_qty) as standard_avg')
+        // ->selectRaw('avg (o.poster_qty) as poster_avg')
+        // ->selectRaw('avg (o.gloss_qty) as gloss_avg')->get();
+        // return $accounts;
+        //---------------------------------------------------------------------
+        // 60a - $events = WebEvent::with('account.salesRep')->get();
+        // $events = $events->groupBy(function($events){
+        //     return $events->channel .'|'. $events->account->name;
+        // });
+        // $events = $events->map(function($events,$name){
+        //     [$channel,$account] = explode('|',$name);
+        //     $count = $events->count();
+        //     return compact('channel','account','count');
+        // })->values();
+        // return $events->sortBy('count',SORT_NUMERIC,true)->values();
+        //------------------------------------------------------------------------
+        // 60b - $events = WebEvent::join('accounts as a','a.id','=','web_events.account_id')
+        // ->join('sales_reps as s','a.sales_rep_id','=','s.id')
+        // ->groupBy('web_events.channel')
+        // ->groupBy('a.name')
+        // ->select('web_events.channel','a.name')
+        // ->selectRaw('count(web_events.id) as count')
+        // ->orderBy('count','desc')
+        // ->get();
+        // return $events;
+        //------------------------------------------------------------------------
+        // 61a - $webEvents = WebEvent::with(['account.salesRep'])->get();
+        // // Map the necessary fields into a new collection
+        // $uniqueWebEvents = $webEvents->map(function($webEvent) {
+        //     return [
+        //         'name' => $webEvent->account->salesRep->name,
+        //         'channel' => $webEvent->channel,
+        //     ];
+        // })->unique(function ($item) {
+        //     return $item['name'] . '|' . $item['channel'];
+        // });
+        // return $uniqueWebEvents->values();
+        //----------------------------------------------------------------------------
+        // 61b - $webEvents = WebEvent::join('accounts as a','web_events.account_id','=','a.id')
+        // ->join('sales_reps as s','s.id','=','a.sales_rep_id')
+        // ->select('web_events.channel','s.name')
+        // ->distinct()
+        // ->get();
+        // return $webEvents;
+        //-----------------------------------------------------------------------
+        // 62 - $sales_reps = SalesRep::with('accounts')->get();
+        // $more_than_account = $sales_reps->filter(function($sales_reps){
+        //     return $sales_reps->accounts->count() > 1 ;
+        // })->count();
+        // $all = $sales_reps->count();
+        // return response()->json([
+        //     'all_accounts'                  =>$all,
+        //     'one_or_less'                   =>$all - $more_than_account,
+        //     'more_than_one'                 =>$more_than_account
+        // ]);
+        //-----------------------------------------------------------------------
+        // 62b - $query = SalesRep::join('accounts as a','a.sales_rep_id','=','sales_reps.id')
+        // ->groupBy('sales_reps.name')
+        // ->select('sales_reps.name')
+        // ->selectRaw('count(a.id) as count')
+        // ->having('count','>',1)
+        // ->get();
+        // return $query->count();
+        //-----------------------------------------------------------------------
+        // 63a - $query = SalesRep::join('accounts as a','a.sales_rep_id','=','sales_reps.id')
+        // ->groupBy('sales_reps.name')
+        // ->select('sales_reps.name')
+        // ->selectRaw('count(a.id) as count')
+        // ->having('count','>',5)
+        // ->get();
+        // return $query->count();
+        //-----------------------------------------------------------------------
+        // 63b - $sales_reps = SalesRep::with('accounts')->get();
+        // $sales_reps = $sales_reps->groupBy('name')->map(function($sales_reps,$name){
+        //     return [
+        //         'name'                          =>$name,
+        //         'count_of_accounts'             =>$sales_reps->first()->accounts->count()
+        //     ];
+        // })->values()
+        // ->filter(function($sales_reps){
+        //     return $sales_reps['count_of_accounts'] > 5;
+        // });
+        // return $sales_reps->count();
+        //-----------------------------------------------------------------------
+        //64a - $accounts = Account::join('orders as o','o.account_id','=','accounts.id')
+        // ->select('accounts.name')
+        // ->selectRaw('count(o.id) as orders_num')
+        // ->groupBy('accounts.name')
+        // ->having('orders_num','>',20)
+        // ->get()->count();
+        // return $accounts;
+        //-----------------------------------------------------------------------
+        //64b - $accounts = Account::with('orders')->get();
+        // $accounts = $accounts->groupBy('name')
+        // ->map(function($accounts , $name){
+        //     return [
+        //         'account'               =>$name,
+        //         'orders_num'            =>$accounts->first()->orders->count()
+        //     ];
+        // })->values()
+        // ->filter(function($accounts){
+        //     return $accounts['orders_num'] > 20;
+        // })->values()->count();
+        // return $accounts;
+        //-----------------------------------------------------------------------
+        // 65a - $query = Account::join('orders as o','o.account_id','=','accounts.id')
+        // ->select('accounts.name')
+        // ->selectRaw('count(o.id) as count')
+        // ->groupBy('accounts.name')
+        // ->orderBy('count','desc')
+        // ->limit(1)
+        // ->get();
+        // return $query->first()->name;
+        //-----------------------------------------------------------------------
+        // 65b -$query = Account::with('orders')->get();
+        // $query = $query->groupBy('name')->map(function($query , $name){
+        //     return [
+        //         'name'                  =>$name,
+        //         'orders_count'          =>$query->first()->orders->count()
+        //     ];
+        // });
+        // $max =  $query->max(function($query){
+        //     return $query['orders_count'];
+        // });
+        // return $query->filter(function($query) use($max){
+        //     return $query['orders_count'] == $max;
+        // })->first()['name'];
+        //-----------------------------------------------------------------------
+
     }
 
     /**
