@@ -9,6 +9,7 @@ use App\Models\SalesRep;
 use App\Models\WebEvent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -896,7 +897,165 @@ class AnswersController extends Controller
         //     return $query['orders_count'] == $max;
         // })->first()['name'];
         //-----------------------------------------------------------------------
-
+        // 66a - $query = Account::join('orders as o','o.account_id','=','accounts.id')
+        // ->select('accounts.name as acc_name')
+        // ->selectRaw('sum(o.standard_amt_usd + o.poster_amt_usd + o.gloss_amt_usd) as sum')
+        // ->groupBy('acc_name')
+        // ->having('sum','>','30000')
+        // ->get()
+        // ->count();
+        // return $query;
+        //-----------------------------------------------------------------------
+        // 66b - $accounts = Account::with('orders')->get();
+        // $accounts = $accounts->groupBy(function($accounts){
+        //     return $accounts->name;
+        // })->map(function($accounts , $accountName){
+        //     return [
+        //         'account_name'              =>$accountName,
+        //         'sum'                       =>$accounts->first()->orders->sum('totalUSD')
+        //     ];
+        // })->filter(function($accounts){
+        //     return $accounts['sum'] > 30000;
+        // })->count();
+        // return $accounts;
+        //-----------------------------------------------------------------------
+        // 67a - $query = Account::join('orders as o','o.account_id','=','accounts.id')
+        // ->select('accounts.name as acc_name')
+        // ->selectRaw('sum(o.standard_amt_usd + o.poster_amt_usd + o.gloss_amt_usd) as sum')
+        // ->groupBy('acc_name')
+        // ->having('sum','<','1000')
+        // ->get()
+        // ->count();
+        // return $query;
+        //-----------------------------------------------------------------------
+        // 67b - $accounts = Account::with('orders')->get();
+        // $accounts = $accounts->groupBy(function($accounts){
+        //     return $accounts->name;
+        // })->map(function($accounts , $accountName){
+        //     return [
+        //         'account_name'              =>$accountName,
+        //         'sum'                       =>$accounts->first()->orders->sum('totalUSD')
+        //     ];
+        // })->filter(function($accounts){
+        //     return $accounts['sum'] < 1000;
+        // })->count();
+        // return $accounts;
+        //-----------------------------------------------------------------------
+        // 68a - $query = Order::join('accounts as a','a.id','=','orders.account_id')
+        // ->select('a.name')
+        // ->selectRaw('sum(orders.standard_amt_usd + orders.poster_amt_usd + orders.gloss_amt_usd) as sum')
+        // ->groupBy('a.name')
+        // ->orderBy('sum')
+        // ->limit(1)
+        // ->get();
+        // return $query->first()->name;
+        //-----------------------------------------------------------------------
+        // 68b - $query = Order::with('account')->get();
+        // $query = $query->groupBy(function($query){
+        //     return $query->account->name;
+        // })->map(function($query , $accountName){
+        //     return [
+        //         'acc'               =>$accountName,
+        //         'sum'               =>$query->sum('totalUSD')
+        //     ];
+        // });
+        // $min = $query->min('sum');
+        // return $query->filter(function($query) use ($min){
+        //     return $query['sum'] == $min;
+        // })->first(function($query){
+        //     return $query['acc'];
+        // });
+        //-----------------------------------------------------------------------
+        // 69a - $query = Account::join('web_events as w','w.account_id','=','accounts.id')
+        // ->select('accounts.name')
+        // ->selectRaw('count(w.id) as events_count')
+        // ->groupBy('accounts.name')
+        // ->where('w.channel','facebook')
+        // ->having('events_count','>',6)
+        // ->get();
+        // return $query;
+        //-----------------------------------------------------------------------
+        // 69b - $query = Account::with('webEvents')->get();
+        // $accounts = collect();
+        // foreach($query as $account){
+        //     foreach($account->webEvents as $webEvent){
+        //         $section = [
+        //             'account_name'              =>$account->name,
+        //             'channel'                   =>$webEvent->channel
+        //         ];
+        //         $accounts = $accounts->push($section);
+        //     }
+        // }
+        // $accounts = $accounts->filter(function($accounts){
+        //     return $accounts['channel'] == 'facebook';
+        // })
+        // ->groupBy('account_name')
+        // ->map(function($accounts , $accountName){
+        //     return [
+        //         'account'           =>$accountName,
+        //         'count'             =>$accounts->count()
+        //     ];
+        // })
+        // ->filter(function($accounts){
+        //     return $accounts['count'] > 6;
+        // });
+        // return $accounts;
+        //-----------------------------------------------------------------------
+        // 70 - $account = Account::join('web_events as w','w.account_id','=','accounts.id')
+        // ->groupBy('accounts.name')
+        // ->select('accounts.name')
+        // ->selectRaw('count(w.id) as count')
+        // ->where('w.channel','facebook')
+        // ->orderBy('count','desc')
+        // ->limit(1)
+        // ->get();
+        // return $account->first()->name;
+        //-----------------------------------------------------------------------
+        // 71a - $years = Order::get();
+        // $years = $years->groupBy(function($years){
+        //     return Carbon::parse($years->occurred_at)->year;
+        // })
+        // ->map(function($years , $year){
+        //     return [
+        //         'year'          =>$year,
+        //         'sum_of_year'   =>$years->sum('totalUSD')
+        //     ];
+        // })->values()
+        // ->sortBy('year')->values();
+        // return $years;
+        //-----------------------------------------------------------------------
+        // 71b - $years = Order::selectRaw('sum(standard_amt_usd+gloss_amt_usd+poster_amt_usd) as sum')
+        // ->selectRaw('year(occurred_at) as year')
+        // ->groupBy('year')
+        // ->orderBy('year')
+        // ->get();
+        // return $years->select('year','sum');
+        //-----------------------------------------------------------------------
+        // 72a - $months = Order::get();
+        // $months = $months->filter(function($months){
+        //     return Carbon::parse($months->occurred_at)->year != 2013 && Carbon::parse($months->occurred_at)->year != 2017;
+        // })
+        // ->groupBy(function($months){
+        //     return Carbon::parse($months->occurred_at)->month;
+        // })
+        // ->map(function($months , $month){
+        //     return [
+        //         'month'                 =>$month,
+        //         'sum_of_month'          =>$months->sum('totalUSD')
+        //     ];
+        // })->sortBy('month',SORT_REGULAR,true)->values()->first();
+        // return $months;
+        //-----------------------------------------------------------------------
+        // 72b - $months =  Order::selectRaw('month(occurred_at) as month')
+        // ->selectRaw('sum(standard_amt_usd+gloss_amt_usd+poster_amt_usd) as sum')
+        // ->whereBetween('occurred_at',['2014-01-01 00:00:00','2017-01-01 00:00:00'])
+        // ->groupBy('month')
+        // ->orderBy('sum','desc')
+        // ->limit(1)
+        // ->get();
+        // return $months;
+        //-----------------------------------------------------------------------
+        
     }
 
     /**
